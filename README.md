@@ -1,4 +1,31 @@
-# Group Chat Simulator: Product Specification
+# Group Chat Simulator
+
+A Discord-like chat app where every group member except you is an AI-controlled character, powered by the Anthropic API. The original product specification is preserved below; the implementation lives in `server/` (Express + SQLite + Anthropic SDK) and `client/` (React + Vite + Tailwind).
+
+## Getting Started
+
+Requirements: Node.js 20+ and an Anthropic API key (BYOK — usage bills to your own Anthropic account).
+
+```sh
+npm install
+npm run dev        # server on :3001, client on :5173
+```
+
+Open http://localhost:5173, click the ⚙️ gear, and paste your Anthropic API key (or set `ANTHROPIC_API_KEY` in the environment before starting). Then hit **+** to create your first group.
+
+- `npm test` — unit tests for the memory-decay model
+- `npm run build && npm start` — production build served by the Express server on :3001
+- All data (SQLite DB, uploaded images/files) lives in `server/data/`, which is gitignored
+
+### Implementation notes / deviations from the spec
+
+- §8.4: "purchase tokens through the app" was dropped — the app is BYOK only. The soft-limit warnings (large group / long conversation) are implemented as specified.
+- Who speaks is decided by a small "director" model call (characters you address by name always reply). The §8.3 toggle enables capped AI-to-AI follow-ups (max 3 per user message).
+- Memory decay (§8.2): recall probability halves every 30 days, observer memories decay 2× faster, and records below 2% recall probability are permanently pruned. Constants live in `server/src/engine/decay.ts`.
+
+---
+
+# Product Specification
 
 ## 1. Core Concept
 
